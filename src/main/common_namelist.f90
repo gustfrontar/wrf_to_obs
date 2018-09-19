@@ -25,6 +25,7 @@ MODULE common_namelist
   REAL(r_size) :: rainratio_threshold = 0.3d0     !Percentaje of ensemble members with reflectivity greather than 0.
   REAL(r_size) :: minrefdbz=0.0d0                 !Reflectivity values below this threshold won't be assimilated.
   REAL(r_size) :: pseudo_rh_error=0.1             !Obserational error for pseudo RH observations.
+  LOGICAL      :: use_pseudorh=.false.            !Wether pseudo rh will be computed.
 
   !RADAR DA
   INTEGER            :: interpolation_technique=1

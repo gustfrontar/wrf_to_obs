@@ -25,7 +25,7 @@ MODULE obsop_tools
    REAL(r_size) :: res , vres                         !Grid resolution (degree and p or z)
    INTEGER      :: nlon , nlat , nlev                 !Grid size 
 
-   REAL(r_size), ALLOCATABLE :: lon(:,:) , lat(:,:) , lev(:,:) !Full coordinates
+   REAL(r_size), ALLOCATABLE :: lon(:,:) , lat(:,:) , lev(:) !Full coordinates
   END TYPE
 
   INTEGER,SAVE :: nobs , nobsradar
@@ -311,7 +311,7 @@ timeslots: DO islot=1,nslots
 
       WRITE(guesfile(3:9),'(I2.2,I5.5)') islot,im
       WRITE(6,'(A,I3.3,2A)') 'MYRANK ',myrank,' is reading a file ',guesfile
-      CALL read_grd(guesfile,v3d,v2d)
+      CALL read_grd(guesfile,1,v3d,v2d)
       !Keep model height 
       zmodel=v3d(:,:,:,iv3d_ph)/gg
 
@@ -359,8 +359,9 @@ timeslots: DO islot=1,nslots
         !
         ! observational operator
         !
-        CALL Trans_XtoY(tmpelm(n),tmptyp(n),tmplon(n),tmplat(n),tmpi(n),tmpj(n),tmpk(n),&
+        CALL Trans_XtoY(tmpelm(n),tmptyp(n),tmplon(n),tmplat(n),tmpdat(n),tmpi(n),tmpj(n),tmpk(n),&
          & tmpaz(n),tmpel(n),v3d,v2d,tmphdxf(n,im))
+
 
       END DO
 !$OMP END PARALLEL DO
@@ -1276,10 +1277,10 @@ IMPLICIT NONE
 TYPE(GRID) , INTENT(INOUT) :: my_grid
 INTEGER      :: i,j,k
 
-  mygrid%minlon=1d30
-  mygrid%maxlon=-1d30
-  mygrid%minlat=1d30
-  mygrid%maxlat=-1d30
+  my_grid%minlon=1d30
+  my_grid%maxlon=-1d30
+  my_grid%minlat=1d30
+  my_grid%maxlat=-1d30
 
   DO i=1,nlon-1
    DO j=1,nlat-1
@@ -1308,7 +1309,7 @@ INTEGER      :: i,j,k
 
   my_grid%nlev=CEILING( (my_grid%maxlev-my_grid%minlev)/my_grid%vres ) + 1
 
-  ALLOCATE( mygrid%lev( my_grid%nlev ) )  
+  ALLOCATE( my_grid%lev( my_grid%nlev ) )  
   DO k = 1,my_grid%nlev
     my_grid%lev(k) = my_grid%minlev + REAL((k-1),r_size)*my_grid%vres
   ENDDO
